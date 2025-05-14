@@ -56,7 +56,7 @@ def check_channels(channels):
             logging.error("⚠ Server is slow, skipping channel")
         except requests.exceptions.TooManyRedirects:
             logging.error("⚠ Channel link is bad, skipping channel")
-        except Exception as e:
+        except Exception:
             logging.error("===== FATAL ERROR =====")
     return server_ok
 
