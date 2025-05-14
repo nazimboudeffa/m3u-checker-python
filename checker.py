@@ -1,6 +1,19 @@
 import argparse
 import requests
 import re
+import os
+import logging
+import subprocess
+import ffmpeg
+
+# Set up logging
+def setup_logging(verbose_level):
+    if verbose_level == 1:
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    elif verbose_level >= 2:
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+    else:
+        logging.basicConfig(level=logging.CRITICAL)  # Only critical errors will be logged by default.
 
 def parse_m3u(m3u_file):
     with open(m3u_file, 'r', encoding='iso-8859-1', errors="ignore") as f:
@@ -13,48 +26,46 @@ def is_valid_url(url):
 
 def handle_status_code(status_code, name):
     status_messages = {
-        403: '403 : Server is not OK :(',
-        404: '404 : Server is not OK :(',
-        500: '500 : Server is not OK :(',
-        503: '503 : Server is not OK :(',
-        504: '504 : Server is not OK :(',
-        200: f'Channel {name} is Ok :)'
+        301: "Moved Permanently",
+        302: "Found",
+        403: "Forbidden",
+        404: "Not Found",
+        500: "Internal Server Error",
+        503: "Service Unavailable"
     }
     if status_code in status_messages:
-        print(status_messages[status_code])
-        return status_code == 200
+        return status_messages[status_code]
     else:
-        print('???')
-        return False
-
+        return "Unknown status"
+    
 def check_channels(channels):
     server_ok = False
     for name, url in channels:
-        print(f'Checking channel: {name} - {url}')
         if not is_valid_url(url):
-            print("⚠ Channel link is bad, skipping channel")
+            logging.info("⚠ Channel url is bad, skipping channel")
             continue
-        print("⚠ Channel link is fine")
         try:
             r = requests.get(url, timeout=5)
-            server_ok = handle_status_code(r.status_code, name)
+            if r.status_code == 200:
+                server_ok = True
+                logging.info(f"Channel {name} is OK")
+            else:
+                status_message = handle_status_code(r.status_code, name)
+                logging.info(f"Channel {name} returned status: {status_message}")
         except requests.exceptions.Timeout:
-            print("⚠ Server is slow, skipping channel")
+            logging.error("⚠ Server is slow, skipping channel")
         except requests.exceptions.TooManyRedirects:
-            print("⚠ Channel link is bad, skipping channel")
+            logging.error("⚠ Channel link is bad, skipping channel")
         except Exception as e:
-            print("===== FATAL ERROR =====")
-            print(e)
+            logging.error("===== FATAL ERROR =====")
     return server_ok
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Extract accessible channels from M3U playlist')
-    
+    parser = argparse.ArgumentParser(description='Extract accessible channels from M3U playlist')   
     parser.add_argument('-l', '--local', help='Path to local M3U file')
-
     args = parser.parse_args()
-
+    setup_logging(1)
     if args.local:
         m3u_file = args.local
     else:
