@@ -24,7 +24,7 @@ def parse_m3u(m3u_file):
 def is_valid_url(url):
     return url.startswith('http://') or url.startswith('https://')
 
-def handle_status_code(status_code, name):
+def handle_status_code(status_code):
     status_messages = {
         301: "Moved Permanently",
         302: "Found",
