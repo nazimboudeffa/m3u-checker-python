@@ -84,14 +84,17 @@ def check_single_channel(name, url):
                 logging.info(f"Stream {name} is valid")
                 if capture_frame(url, name):
                     logging.info(f"Screenshot captured for {name}")
+                    return True
                 else:
                     logging.error(f"Failed to capture screenshot for {name}")
+                    return False
             else:
                 logging.error(f"Stream {name} is not valid")
-            return True
+                return False
         else:
             status_message = handle_status_code(r.status_code)
             logging.info(f"Channel {name} returned status: {status_message}")
+            return False
     except requests.exceptions.Timeout as e:
         logging.error(f"Timeout when trying to access {name}: {e}")
     except requests.exceptions.TooManyRedirects as e:
