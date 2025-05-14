@@ -95,12 +95,12 @@ def check_single_channel(name, url):
         else:
             status_message = handle_status_code(r.status_code)
             logging.info(f"Channel {name} returned status: {status_message}")
-    except requests.exceptions.Timeout:
-        logging.error("⚠ Server is slow, skipping channel")
-    except requests.exceptions.TooManyRedirects:
-        logging.error("⚠ Channel link is bad, skipping channel")
-    except Exception:
-        logging.error("===== FATAL ERROR =====")
+    except requests.exceptions.Timeout as e:
+        logging.error(f"Timeout when trying to access {name}: {e}")
+    except requests.exceptions.TooManyRedirects as e:
+        logging.error(f"Too many redirects for {name}: {e}")
+    except Exception as e:
+        logging.error(f"Unexpected error: {e}")
     return False
 
 def check_channels(channels):
