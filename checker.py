@@ -54,15 +54,21 @@ def check_stream(url):
         logging.error(f"Unexpected error: {e}")
         return False
 
-def capture_frame(url, file_name, output_path="captures"):
+def capture_frame(url, name, output_path="captures"):
+    file_name = re.sub(r'[^a-zA-Z0-9]', '_', name)
+    if len(file_name) > 50:
+        file_name = file_name[:50]
+    logging.debug(f"Capturing frame for {file_name}...")
     if not os.path.exists(output_path):
         os.makedirs(output_path)
-    command = [
-        'ffmpeg', '-y', '-i', url, '-ss', '00:00:02', '-frames:v', '1',
-        os.path.join(output_path, f"{file_name}.png")
-    ]
     try:
-        subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=30)
+        (
+            ffmpeg
+            .input(url, ss=2)  # seek to 2 seconds
+            .output(file_name, vframes=1)
+            .overwrite_output()
+            .run(quiet=True, capture_stdout=True, capture_stderr=True, timeout=30)
+        )
         logging.debug(f"Screenshot saved for {file_name}")
         return True
     except subprocess.TimeoutExpired:
@@ -107,8 +113,11 @@ def check_channels(channels):
 def main():
     parser = argparse.ArgumentParser(description='Extract accessible channels from M3U playlist')   
     parser.add_argument('-l', '--local', help='Path to local M3U file')
+    parser.add_argument('-v', '--verbose', action='count', default=0, help='Increase verbosity level (use -vv for debug)')
     args = parser.parse_args()
-    setup_logging(1)
+    setup_logging(args.verbose)
+    if args.verbose >= 2:
+        logging.debug("Debug mode enabled")
     if args.local:
         m3u_file = args.local
     else:
