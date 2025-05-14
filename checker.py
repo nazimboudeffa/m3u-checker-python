@@ -61,15 +61,12 @@ def capture_frame(url, name, output_path="captures"):
     logging.debug(f"Capturing frame for {file_name}...")
     if not os.path.exists(output_path):
         os.makedirs(output_path)
+    command = [
+        'ffmpeg', '-y', '-i', url, '-ss', '00:00:02', '-frames:v', '1',
+        os.path.join(output_path, f"{file_name}.png")
+    ]
     try:
-        (
-            ffmpeg
-            .input(url, ss=2)  # seek to 2 seconds
-            .output(file_name, vframes=1)
-            .overwrite_output()
-            .run(quiet=True, capture_stdout=True, capture_stderr=True, timeout=30)
-        )
-        logging.debug(f"Screenshot saved for {file_name}")
+        subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=30)
         return True
     except subprocess.TimeoutExpired as e:
         logging.error(f"Timeout when trying to capture frame for {file_name}: {e}")
