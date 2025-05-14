@@ -105,6 +105,9 @@ def check_channels(channels):
     for name, url in channels:
         if check_single_channel(name, url):
             server_ok = True
+            logging.info(f"{"\033[92m"}{'✓'} {name} - {url}\033[0m")
+        else:
+            logging.error(f"{"\033[91m"}{'✕'} {name} - {url}\033[0m")
     return server_ok
 
 def main():
