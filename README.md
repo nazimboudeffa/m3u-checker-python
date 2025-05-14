@@ -2,6 +2,8 @@
 
 This is a Python script that checks an m3u file
 
+# Installation
+
 On Windows install ffmpeg and add bin folder in PATH from https://ffmpeg.org/download.html
 
 ```
