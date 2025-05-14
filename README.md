@@ -12,4 +12,6 @@ pip install requests
 python checker.py -l path/to/local.m3u
 ```
 
+- **`-v`**: Increase output verbosity to `INFO` level.
+- **`-vv`**: Increase output verbosity to `DEBUG` level.
 
