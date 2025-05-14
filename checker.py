@@ -42,7 +42,7 @@ def check_channels(channels):
     server_ok = False
     for name, url in channels:
         if not is_valid_url(url):
-            logging.info("⚠ Channel url is bad, skipping channel")
+            logging.info(f"Channel {name} url is bad, skipping channel")
             continue
         try:
             r = requests.get(url, timeout=5)
@@ -50,7 +50,7 @@ def check_channels(channels):
                 server_ok = True
                 logging.info(f"Channel {name} is OK")
             else:
-                status_message = handle_status_code(r.status_code, name)
+                status_message = handle_status_code(r.status_code)
                 logging.info(f"Channel {name} returned status: {status_message}")
         except requests.exceptions.Timeout:
             logging.error("⚠ Server is slow, skipping channel")
