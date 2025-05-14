@@ -71,8 +71,8 @@ def capture_frame(url, name, output_path="captures"):
         )
         logging.debug(f"Screenshot saved for {file_name}")
         return True
-    except subprocess.TimeoutExpired:
-        logging.error(f"Timeout when trying to capture frame for {file_name}")
+    except subprocess.TimeoutExpired as e:
+        logging.error(f"Timeout when trying to capture frame for {file_name}: {e}")
         return False
     
 def check_single_channel(name, url):
