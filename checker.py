@@ -130,7 +130,11 @@ def main():
     --------------------------                                                                                                                                     
     """)
     channels = parse_m3u(m3u_file)
-    check_channels(channels)
+    if check_channels(channels) :
+        logging.info("Some channels are OK")
+    else:
+        logging.error("Some channels are not OK")
+    logging.info("All channels checked")
 
 if __name__ == '__main__':
     main()
