@@ -19,7 +19,7 @@ git clone https://github.com/nazimboudeffa/m3u-checker-python.git
 cd m3u-checker-python
 ```
 
-# Install Dependencies
+## Install Dependencies
 
 ```bash
 pip install -r requirements.txt
